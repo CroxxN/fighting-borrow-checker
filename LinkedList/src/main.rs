@@ -1,5 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, mem};
 
+#[derive(Clone)]
 struct Node {
     id: i32,
     value: i32,
@@ -51,6 +52,18 @@ impl Node {
                 println!("Found {self}");
             }
             Some(ref val) => val.search_value(value),
+            None => {
+                println!("Value not found");
+            }
+        }
+    }
+    fn delete_id(&mut self, id: i32) {
+        match self.next {
+            Some(ref val) if val.value == id => {
+                mem::replace(self.next, val);
+                self.next = val.next.clone();
+            }
+            Some(ref mut val) => val.delete_id(id),
             None => {
                 println!("Value not found");
             }
