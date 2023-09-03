@@ -15,6 +15,8 @@ impl Display for Node {
 }
 
 impl Node {
+    // Universal, all-pervading, all-encompassing, all-powerful, omnipotent, omniscient, omnipresent, primordial
+    // pre-historical, data: 0
     fn new(value: i32) -> Node {
         Node {
             id: 0,
@@ -47,10 +49,11 @@ impl Node {
         }
     }
     fn search_value(&self, value: i32) {
+        if self.value == value {
+            println!("Found {self}");
+            return;
+        }
         match self.next {
-            _ if self.value == value => {
-                println!("Found {self}");
-            }
             Some(ref val) => val.search_value(value),
             None => {
                 println!("Value not found");
@@ -58,14 +61,26 @@ impl Node {
         }
     }
     fn delete_id(&mut self, id: i32) {
+        // Currently ignore if the value is the first
+        if self.value == id {
+            if let Some(ref n) = self.next {
+                _ = mem::replace(self, n.as_ref().to_owned());
+            } else {
+                *self = Self::new(0);
+            }
+        }
         match self.next {
-            Some(ref val) if val.value == id => {
-                mem::replace(self.next, val);
-                self.next = val.next.clone();
+            Some(ref mut val) if val.value == id => {
+                if let Some(ref t) = val.next {
+                    _ = mem::replace(val, t.to_owned());
+                } else {
+                    self.next = None;
+                }
+                println!("DONE");
             }
             Some(ref mut val) => val.delete_id(id),
             None => {
-                println!("Value not found");
+                println!("Such value doesn't exist");
             }
         }
     }
@@ -78,4 +93,12 @@ fn main() {
     list.print_value();
     list.search_value(12);
     list.search_value(66);
+    // Works. First we check if 45 exists(we know it does), then we delete it
+    // and then we search again, which returns null this time. Neat
+    list.search_value(45);
+    list.delete_id(45);
+    list.search_value(45);
+    list.delete_id(12);
+    list.delete_id(66);
+    list.print_value();
 }
